@@ -8,7 +8,7 @@ def select_month():
 
     # Set the height of the window to 100 pixels
     window_width = 570
-    window_height = 100
+    window_height = 120
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
     x = int(screen_width / 4)
@@ -43,7 +43,6 @@ def select_month():
     option_menu.config(width=35, height=3)
     option_menu.pack()
 
-
     def get_month_num():
         window.quit()
         return month_values[month.get()]
@@ -51,11 +50,10 @@ def select_month():
     tk.Button(window, text="Get Month Number", command=get_month_num).pack()
 
     window.mainloop()
+    # window.destroy()
+    window.withdraw()
     return get_month_num()
 
 
 if __name__ == '__main__':
-    # print(datetime.now().strftime('%B'))
-
-
     print(select_month())
