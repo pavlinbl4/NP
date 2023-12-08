@@ -9,7 +9,7 @@ def image_downloader(csv_file_path, month, month_number, current_year, folder_pa
     with open(csv_file_path, 'r') as input_file:
         reader = csv.reader(input_file)
 
-        for row in tqdm(reader, colour='blue', ncols=1000, desc="Image downloading"):
+        for row in tqdm(reader, colour='blue',ncols=1000, desc="Image downloading"):
 
             if month in row[0]:
                 image_link = row[2]
