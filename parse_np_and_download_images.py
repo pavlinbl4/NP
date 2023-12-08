@@ -4,6 +4,11 @@ import requests
 from datetime import datetime
 from pathlib import Path
 from image_downloader import image_downloader
+from tqdm import tqdm, trange, tqdm_gui
+import os
+import datetime
+import locale
+from datetime import datetime
 
 
 def make_documets_folder(name):
@@ -16,13 +21,13 @@ def get_html(url):
     return req.text
 
 
-def write_csv(data):
+def write_csv(data, csv_file_path):
     with open(csv_file_path, 'a') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow((data["date"], data["name"], data["url"]))
 
 
-def get_data(html):
+def get_data(html, csv_file_path):
     soup = BeautifulSoup(html, 'lxml')
     articles = soup.find_all('div', class_="l-page__main-news--item")
     for title in articles:
@@ -34,10 +39,20 @@ def get_data(html):
         data = {"date": article_date_lookfine,
                 "name": article_name,
                 "url": image_link}
-        write_csv(data)
+        write_csv(data, csv_file_path)
+
+def month_information():
+    now = datetime.now()
+
+    # Set locale to Russian
+    locale.setlocale(locale.LC_TIME, 'ru_RU')
+
+    # Get month name in Russian
+    month_name = now.strftime("%B")
+    print(month_name)
 
 
-def date_convert():  # функция преобразует введенный номер месяца в его название
+def date_convert(month_number):  # функция преобразует введенный номер месяца в его название
     voc = {1: 'января',
            2: 'февраля',
            3: 'марта',
@@ -54,31 +69,29 @@ def date_convert():  # функция преобразует введенный 
     return month_name
 
 
-def main():
+def get_all_images(month_number):
     url = "https://newprospect.ru"
-    for i in range(5):
-        get_data(get_html(url))
+    current_year = datetime.now().year
+
+    folder_path = make_documets_folder('NewProspect')
+
+    month = date_convert(month_number)
+    csv_file_path = f"{folder_path}/NP.csv"
+    for i in trange(5,colour='blue', ncols = 100, desc='Main cycle'):
+        get_data(get_html(url), csv_file_path)
         soup = BeautifulSoup(get_html(url), 'lxml')
         url = "https://newprospect.ru" + soup.find('li', class_='l-nav__pagination-item next').find('a').get('href')
-    print('CSV file created')
+    # print('CSV file created')
     image_downloader(csv_file_path, month, month_number, current_year, folder_path)
     print('Images downloaded - please select you images and run "create_report" script')
+    os.remove(csv_file_path)
+    return folder_path
 
-
-month_number = datetime.now().month
-current_year = datetime.now().year
-
-folder_path = make_documets_folder('NewProspect')
-
-month = date_convert()
-csv_file_path = f"{folder_path}/NP.csv"
 
 if __name__ == '__main__':
-    main()
+    # get_all_images(3)
+    month_information()
 
 
-#  real image link https://newprospect.ru/upload/resize_cache/iblock/953/758_493_2/5iq84jvywtyyn7a3vehkopbmttwdd3ml.JPG
-# image link 'https:/upload/resize_cache/iblock/953/758_493_2/5iq84jvywtyyn7a3vehkopbmttwdd3ml.JPG'
 
 
-#
