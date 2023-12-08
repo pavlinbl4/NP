@@ -50,8 +50,9 @@ def select_month():
     tk.Button(window, text="Get Month Number", command=get_month_num).pack()
 
     window.mainloop()
-    # window.destroy()
+
     window.withdraw()
+    # window.destroy()
     return get_month_num()
 
 
