@@ -2,74 +2,72 @@
 проверя скачанные парсером снимки нового проспекта за месяц и генерю
 файл отчета с превью
 """
-
+from pathlib import Path
 from openpyxl import Workbook
-from openpyxl.drawing.image import Image
-import os
+
 from datetime import datetime
+from openpyxl.utils import get_column_letter
 from folder_in_MY_documents import make_documets_folder
 from openpyxl.styles import (
     Border, Side,
     Alignment, Font
 )
+from image_resize import image_resize
+from set_column_dimensions import set_column_dimensions
 
 filename_data = datetime.now().day
 month_name = datetime.now().month
 current_year = datetime.now().year
 
-way_to_files = f"{make_documets_folder('NewProspect')}/{current_year}_{month_name}"  # путь к папке с изображениями
-# names = os.listdir(way_to_files)
-names = os.listdir(way_to_files)
+way_to_files = Path(
+    f"{make_documets_folder('NewProspect')}/{current_year}_{month_name}")  # путь к папке с изображениями
 
-wb = Workbook()
-ws = wb.active
-ws.title = "Sheet with image"  # задаю название вкладки
-ws.column_dimensions['C'].width = 40
-ws.column_dimensions['A'].width = 20
-ws.column_dimensions['B'].width = 95
-ws.column_dimensions['D'].width = 20
+workbook = Workbook()
+worksheet = workbook.active
+worksheet.title = "Sheet with image"  # задаю название вкладки
 
-count = 0
-thin = Side(border_style="thin", color="000000")
-for name in names:
-    if name.endswith('JPG') or name.endswith('jpg'):
-        count += 1
-        ws.row_dimensions[count].height = 150  # задаю высоту столбца
-        print(f"{way_to_files}/{name}")
-        img = Image(f"{way_to_files}/{name}")
-        resize_height = img.height // 3  # уменьшая рарешение в два раза
-        resize_width = img.width // 3  # уменьшая рарешение в два раза
+# in list widths of all columns
+worksheet = set_column_dimensions(worksheet, [20, 95, 40, 20])
 
-        img.width = resize_width  # устанавливаю размер превью
-        img.height = resize_height  # устанавливаю размер превью
-        ws[f'C{count}'].border = Border(left=thin, right=thin, top=thin,
-                                        bottom=thin)
-        ws.add_image(img, f'C{count}')
+thin_border = Border(left=Side(border_style="thin"),
+                     right=Side(border_style="thin"),
+                     top=Side(border_style="thin"),
+                     bottom=Side(border_style="thin"))
 
-        ws[f'A{count}'].font = Font(size=14, bold=True)
-        ws[f'A{count}'].alignment = Alignment(vertical='center')
-        ws[f'A{count}'].border = Border(left=thin, right=thin, top=thin,
-                                        bottom=thin)
-        ws[f'A{count}'] = name.split("__")[0]
+for row, image_path in enumerate(way_to_files.glob("*.JPG"), 1):
+    worksheet.row_dimensions[row].height = 150  # задаю высоту столбца
+    print(image_path)
 
-        ws[f'B{count}'].font = Font(size=12, bold=True)
-        ws[f'B{count}'].alignment = Alignment(wrap_text=True, vertical='center')
-        ws[f'B{count}'].border = Border(left=thin, right=thin, top=thin,
-                                        bottom=thin)
-        ws[f'B{count}'] = name.split("__")[1][:-4]
+    # resize image
+    img = image_resize(image_path)
 
-        ws[f'D{count}'].alignment = Alignment(horizontal='center', vertical='center')
-        ws[f'D{count}'].border = Border(left=thin, right=thin, top=thin,
-                                        bottom=thin)
-        ws[f'D{count}'].font = Font(size=14, bold=True)
-        ws[f'D{count}'] = 500
+    worksheet[f'{get_column_letter(3)}{row}'].alignment = Alignment(horizontal='center', vertical='center')
+    worksheet[f'{get_column_letter(3)}{row}'].border = thin_border
+    worksheet.add_image(img, f"{get_column_letter(3)}{row}")
 
-ws[f'D{count + 3}'].alignment = Alignment(horizontal='center', vertical='center')
-ws[f'D{count + 3}'].font = Font(size=17, bold=True, color="FF0000")
-ws[f'D{count + 3}'] = f"=SUM(D$1:D${count})"
+    worksheet[f'{get_column_letter(1)}{row}'].font = Font(size=14, bold=True)
+    worksheet[f'{get_column_letter(1)}{row}'].alignment = Alignment(vertical='center')
+    worksheet[f'{get_column_letter(1)}{row}'].border = thin_border
+    worksheet[f'{get_column_letter(1)}{row}'].value = image_path.name.split("__")[0]
 
-ws[f'B{count + 3}'].font = Font(size=17, bold=True, color="FF0000")
-ws[f'B{count + 3}'].alignment = Alignment(horizontal='center', vertical='center')
-ws[f'B{count + 3}'] = "ИТОГО"
+    worksheet[f'{get_column_letter(2)}{row}'].font = Font(size=12, bold=True)
+    worksheet[f'{get_column_letter(2)}{row}'].alignment = Alignment(wrap_text=True, vertical='center')
+    worksheet[f'{get_column_letter(2)}{row}'].border = thin_border
+    worksheet[f'{get_column_letter(2)}{row}'].value = image_path.name.split("__")[1][:-4]
 
-wb.save(f"{way_to_files}/report_{current_year}_{month_name}.xlsx")
+    worksheet[f'{get_column_letter(4)}{row}'].font = Font(size=14, bold=True)
+    worksheet[f'{get_column_letter(4)}{row}'].alignment = Alignment(horizontal='center', vertical='center')
+    worksheet[f'{get_column_letter(4)}{row}'].border = thin_border
+    worksheet[f'{get_column_letter(4)}{row}'].value = 500
+
+worksheet[f'{get_column_letter(4)}{row + 3}'].alignment = Alignment(horizontal='center', vertical='center')
+worksheet[f'{get_column_letter(4)}{row + 3}'].font = Font(size=17, bold=True, color="FF0000")
+worksheet[f'{get_column_letter(4)}{row + 3}'].border = thin_border
+worksheet[f'{get_column_letter(4)}{row + 3}'].value = f"=SUM(D$1:D${row})"
+
+worksheet[f'{get_column_letter(2)}{row + 3}'].font = Font(size=17, bold=True, color="FF0000")
+worksheet[f'{get_column_letter(2)}{row + 3}'].alignment = Alignment(horizontal='center', vertical='center')
+worksheet[f'{get_column_letter(2)}{row + 3}'].border = thin_border
+worksheet[f'{get_column_letter(2)}{row + 3}'].value = "ИТОГО"
+
+workbook.save(f"{way_to_files}/report_{current_year}_{month_name}.xlsx")
