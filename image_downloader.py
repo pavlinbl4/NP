@@ -4,25 +4,32 @@ import requests
 from tqdm import tqdm
 
 
+def downloader(image_url: str, folder_path: str, image_name: str):
+    try:
+        r = requests.get(image_url, stream=True)
+        with open(
+                f"{folder_path}/{image_name}.JPG",
+                "bw") as f:
+            for chunk in r.iter_content(9000):
+                f.write(chunk)
+    except Exception as ex:
+        print(ex)
+
+
 def image_downloader(csv_file_path, month, month_number, current_year, folder_path):
-    os.makedirs(f"{folder_path}/{current_year}_{month_number}", exist_ok=True)
+    # create folder to downloading images
+    path_to_folder = f"{folder_path}/{current_year}_{month_number}"
+    os.makedirs(path_to_folder, exist_ok=True)
+
+    # read data from csv file
     with open(csv_file_path, 'r') as input_file:
         reader = csv.reader(input_file)
 
-        for row in tqdm(reader, colour='blue',ncols=1000, desc="Image downloading"):
+        for row in tqdm(reader, colour='blue', ncols=1000, desc="Image downloading"):
 
             if month in row[0]:
-                image_link = row[2]
-                try:
-                    r = requests.get(image_link, stream=True)
-                    with open(
-                            f"{folder_path}/{current_year}_{month_number}/{row[0]}__{row[1]}.JPG",
-                            "bw") as f:
-
-                        for chunk in r.iter_content(9000):
-                            f.write(chunk)
-                except Exception as ex:
-                    print(ex)
+                image_url = row[2]
+                downloader(image_url, path_to_folder, f'{row[0]}__{row[1]}')
 
 
 if __name__ == '__main__':
