@@ -13,10 +13,10 @@ from openpyxl.styles import (
     Alignment, Font
 )
 from image_resize import image_resize
+from select_month import select_month
 from set_column_dimensions import set_column_dimensions
 
-filename_data = datetime.now().day
-month_name = datetime.now().month
+month_name = select_month()
 current_year = datetime.now().year
 
 way_to_files = Path(
@@ -27,7 +27,7 @@ worksheet = workbook.active
 worksheet.title = "Sheet with image"  # задаю название вкладки
 
 # in list widths of all columns
-worksheet = set_column_dimensions(worksheet, [20, 95, 40, 20])
+worksheet = set_column_dimensions(worksheet, [25, 240, 40, 25])
 
 thin_border = Border(left=Side(border_style="thin"),
                      right=Side(border_style="thin"),
@@ -37,28 +37,24 @@ thin_border = Border(left=Side(border_style="thin"),
 for row, image_path in enumerate(way_to_files.glob("*.JPG"), 1):
     worksheet.row_dimensions[row].height = 150  # задаю высоту столбца
     print(image_path)
-
-    # resize image
     img = image_resize(image_path)
 
-    worksheet[f'{get_column_letter(3)}{row}'].alignment = Alignment(horizontal='center', vertical='center')
-    worksheet[f'{get_column_letter(3)}{row}'].border = thin_border
-    worksheet.add_image(img, f"{get_column_letter(3)}{row}")
+    for column in range(1, 5):
+        # cells view
+        worksheet[f'{get_column_letter(column)}{row}'].border = thin_border
+        worksheet[f'{get_column_letter(column)}{row}'].font = Font(size=14, bold=True)
+        worksheet[f'{get_column_letter(column)}{row}'].alignment = Alignment(horizontal='center',
+                                                                             vertical='center',
+                                                                             wrap_text=True)
+        worksheet[f'{get_column_letter(3)}{row}'].alignment = Alignment(horizontal='center',
+                                                                             vertical='center',
+                                                                             )
+        # add information to cells
 
-    worksheet[f'{get_column_letter(1)}{row}'].font = Font(size=14, bold=True)
-    worksheet[f'{get_column_letter(1)}{row}'].alignment = Alignment(vertical='center')
-    worksheet[f'{get_column_letter(1)}{row}'].border = thin_border
-    worksheet[f'{get_column_letter(1)}{row}'].value = image_path.name.split("__")[0]
-
-    worksheet[f'{get_column_letter(2)}{row}'].font = Font(size=12, bold=True)
-    worksheet[f'{get_column_letter(2)}{row}'].alignment = Alignment(wrap_text=True, vertical='center')
-    worksheet[f'{get_column_letter(2)}{row}'].border = thin_border
-    worksheet[f'{get_column_letter(2)}{row}'].value = image_path.name.split("__")[1][:-4]
-
-    worksheet[f'{get_column_letter(4)}{row}'].font = Font(size=14, bold=True)
-    worksheet[f'{get_column_letter(4)}{row}'].alignment = Alignment(horizontal='center', vertical='center')
-    worksheet[f'{get_column_letter(4)}{row}'].border = thin_border
-    worksheet[f'{get_column_letter(4)}{row}'].value = 500
+        worksheet[f'{get_column_letter(1)}{row}'].value = image_path.name.split("__")[0]
+        worksheet[f'{get_column_letter(2)}{row}'].value = image_path.name.split("__")[1][:-4]
+        worksheet.add_image(img, f"{get_column_letter(3)}{row}")
+        worksheet[f'{get_column_letter(4)}{row}'].value = 500
 
 worksheet[f'{get_column_letter(4)}{row + 3}'].alignment = Alignment(horizontal='center', vertical='center')
 worksheet[f'{get_column_letter(4)}{row + 3}'].font = Font(size=17, bold=True, color="FF0000")
