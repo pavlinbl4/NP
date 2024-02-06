@@ -12,7 +12,7 @@ from openpyxl.styles import (
     Border, Side,
     Alignment, Font
 )
-from image_resize import image_resize
+from openpyxl.drawing.image import Image
 from select_month import select_month
 from set_column_dimensions import set_column_dimensions
 
@@ -39,7 +39,11 @@ for row, image_path in enumerate(way_to_files.glob("*.JPG"), 1):
     worksheet.row_dimensions[row].height = 130  # задаю высоту столбца
 
     print(image_path)
-    img = image_resize(image_path)
+
+    img = Image(image_path)
+    img.width //= 3
+    img.height //= 3
+
 
     for column in range(1, 5):
         # cells view
