@@ -1,5 +1,5 @@
 """
-проверя скачанные парсером снимки нового проспекта за месяц и генерю
+Из скачанных парсером снимков нового проспекта за месяц генерю
 файл отчета с превью
 """
 from pathlib import Path
@@ -62,7 +62,6 @@ for column in range(1, 5):
     worksheet[f'{get_column_letter(column)}{row + 3}'].alignment = Alignment(horizontal='center', vertical='center')
     worksheet[f'{get_column_letter(column)}{row + 3}'].font = Font(size=32, bold=True, color="FF0000")
     worksheet[f'{get_column_letter(column)}{row + 3}'].border = thin_border
-
 
     worksheet.row_dimensions[row + 3].height = 60
     worksheet[f'{get_column_letter(2)}{row + 3}'].value = "ИТОГО"
