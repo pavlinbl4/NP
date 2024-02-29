@@ -2,6 +2,7 @@ import csv
 import os
 import requests
 from tqdm import tqdm
+from pathlib import Path
 
 
 def downloader(image_url: str, folder_path: str, image_name: str):
@@ -33,5 +34,5 @@ def image_downloader(csv_file_path, month, month_number, current_year, folder_pa
 
 
 if __name__ == '__main__':
-    image_downloader('/Volumes/big4photo/Documents/NewProspect/NP.csv',
-                     'июля', 7, 2023, '/Volumes/big4photo/Documents/NewProspect')
+    image_downloader(f'{Path().home()}/Documents/NewProspect/NP.csv',
+                     'июля', 7, 2023, f'{Path().home()}/Documents/NewProspect')
