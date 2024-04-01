@@ -7,20 +7,20 @@ from openpyxl import Workbook
 
 from datetime import datetime
 from openpyxl.utils import get_column_letter
-from folder_in_MY_documents import make_documets_folder
+from files_and_folders.folder_in_MY_documents import make_documents_folder
 from openpyxl.styles import (
     Border, Side,
     Alignment, Font
 )
-from image_resize import image_resize
-from select_month import select_month
-from set_column_dimensions import set_column_dimensions
+from parsing.image_resize import image_resize
+from gui_tools.select_month import select_month
+from xlsx_tools.set_column_dimensions import set_column_dimensions
 
 month_name = select_month()
 current_year = datetime.now().year
 
 way_to_files = Path(
-    f"{make_documets_folder('NewProspect')}/{current_year}_{month_name}")  # путь к папке с изображениями
+    f"{make_documents_folder('NewProspect')}/{current_year}_{month_name}")  # путь к папке с изображениями
 
 workbook = Workbook()
 worksheet = workbook.active

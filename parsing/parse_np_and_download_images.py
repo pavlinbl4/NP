@@ -3,7 +3,8 @@ import csv
 import requests
 from datetime import datetime
 from pathlib import Path
-from image_downloader import image_downloader
+
+from parsing.image_downloader import image_downloader
 
 
 def make_documents_folder(name):

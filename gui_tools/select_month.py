@@ -4,7 +4,7 @@ import tkinter as tk
 from datetime import datetime
 
 
-def select_month():
+def select_month() -> int:
     window = tk.Tk()
     window.title("Select a Month")
 
@@ -59,4 +59,4 @@ def select_month():
 
 
 if __name__ == '__main__':
-    print(select_month())
+    print(type(select_month()))

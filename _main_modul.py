@@ -1,5 +1,5 @@
-from parse_np_and_download_images import get_all_images
-from select_month import select_month
+from parsing.parse_np_and_download_images import get_all_images
+from gui_tools.select_month import select_month
 
 
 def main():
