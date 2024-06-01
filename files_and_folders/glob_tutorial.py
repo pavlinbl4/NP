@@ -1,5 +1,5 @@
 import glob
-from pathlib import Path
+from icecream import ic
 
 
 def any_case_extension(extension: str):
@@ -23,3 +23,4 @@ print(files)
 if __name__ == '__main__':
     assert (any_case_extension('jpeg')) == '[jJ][pP][eE][gG]'
     assert (any_case_extension('JPEG')) == '[jJ][pP][eE][gG]'
+

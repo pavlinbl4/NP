@@ -7,20 +7,20 @@ from openpyxl import Workbook
 
 from datetime import datetime
 from openpyxl.utils import get_column_letter
-from folder_in_MY_documents import make_documets_folder
+from files_and_folders.folder_in_MY_documents import make_documents_folder
 from openpyxl.styles import (
     Border, Side,
     Alignment, Font
 )
-from openpyxl.drawing.image import Image
-from select_month import select_month
-from set_column_dimensions import set_column_dimensions
+from parsing.image_resize import image_resize
+from gui_tools.select_month import select_month
+from xlsx_tools.set_column_dimensions import set_column_dimensions
 
 month_name = select_month()
 current_year = datetime.now().year
 
 way_to_files = Path(
-    f"{make_documets_folder('NewProspect')}/{current_year}_{month_name}")  # путь к папке с изображениями
+    f"{make_documents_folder('NewProspect')}/{current_year}_{month_name}")  # путь к папке с изображениями
 
 workbook = Workbook()
 worksheet = workbook.active
@@ -39,11 +39,7 @@ for row, image_path in enumerate(way_to_files.glob("*.JPG"), 1):
     worksheet.row_dimensions[row].height = 130  # задаю высоту столбца
 
     print(image_path)
-
-    img = Image(image_path)
-    img.width //= 3
-    img.height //= 3
-
+    img = image_resize(image_path)
 
     for column in range(1, 5):
         # cells view
@@ -66,6 +62,7 @@ for column in range(1, 5):
     worksheet[f'{get_column_letter(column)}{row + 3}'].alignment = Alignment(horizontal='center', vertical='center')
     worksheet[f'{get_column_letter(column)}{row + 3}'].font = Font(size=32, bold=True, color="FF0000")
     worksheet[f'{get_column_letter(column)}{row + 3}'].border = thin_border
+
 
     worksheet.row_dimensions[row + 3].height = 60
     worksheet[f'{get_column_letter(2)}{row + 3}'].value = "ИТОГО"
