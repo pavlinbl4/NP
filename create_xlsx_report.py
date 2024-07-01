@@ -73,3 +73,4 @@ for column in range(1, 5):
     worksheet[f'{get_column_letter(4)}{row + 3}'].value = f"=SUM(D$1:D${row})"
 
 workbook.save(f"{way_to_files}/report_{current_year}_{month_name}.xlsx")
+workbook.close()
