@@ -16,6 +16,8 @@ from parsing.image_resize import image_resize
 from gui_tools.select_month import select_month
 from xlsx_tools.set_column_dimensions import set_column_dimensions
 
+from loguru import logger
+
 month_name = select_month()
 current_year = datetime.now().year
 
@@ -35,10 +37,12 @@ thin_border = Border(left=Side(border_style="thin"),
                      bottom=Side(border_style="thin"))
 # worksheet.row_dimensions.defaultRowHeight = 130
 
+row = 0
+
 for row, image_path in enumerate(way_to_files.glob("*.JPG"), 1):
     worksheet.row_dimensions[row].height = 130  # задаю высоту столбца
 
-    print(image_path)
+    logger.info(image_path)
     img = image_resize(image_path)
 
     for column in range(1, 5):
@@ -55,6 +59,7 @@ for row, image_path in enumerate(way_to_files.glob("*.JPG"), 1):
 
         worksheet[f'{get_column_letter(1)}{row}'].value = image_path.name.split("__")[0]
         worksheet[f'{get_column_letter(2)}{row}'].value = image_path.name.split("__")[1][:-4]
+        logger.info(img)
         worksheet.add_image(img, f"{get_column_letter(3)}{row}")
         worksheet[f'{get_column_letter(4)}{row}'].value = 500
 
@@ -62,7 +67,6 @@ for column in range(1, 5):
     worksheet[f'{get_column_letter(column)}{row + 3}'].alignment = Alignment(horizontal='center', vertical='center')
     worksheet[f'{get_column_letter(column)}{row + 3}'].font = Font(size=32, bold=True, color="FF0000")
     worksheet[f'{get_column_letter(column)}{row + 3}'].border = thin_border
-
 
     worksheet.row_dimensions[row + 3].height = 60
     worksheet[f'{get_column_letter(2)}{row + 3}'].value = "ИТОГО"
